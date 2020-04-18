@@ -19,12 +19,6 @@ if "channel" in collection_list:
 else:
     print("youtube.channel collection does not exist")
 
-# print db status
-# with cluster:
-#     db = cluster.testdb
-#     status = db.command("dbstats")
-#     print(status)
-
 
 def execute_choice(choice):
     """
@@ -89,14 +83,20 @@ def execute_choice(choice):
         cursor = get_most_viewed_channel()
         print(get_result_string(cursor))
     elif choice == 13:
-        # exec function
-        print("execute choice to be done")
+        channel_name = input("Enter name of channel: ")
+        delete_channel(channel_name)
     elif choice == 14:
         # exec function
         print("execute choice to be done")
     elif choice == 15:
         # exec function
         print("execute choice to be done")
+    elif choice == 16:
+        num = input("How many channels fo you want to see: ")
+        num = int(num)
+        print(get_result_string(get_channel_list(num)))
+    else:
+        print("invalid choice")
 
 
 def get_result_string(cursor):
@@ -118,7 +118,6 @@ def get_channel_string(doc):
     :param doc:
     :return:
     """
-    # note: will not work if cursor is passed
     a_channel = ""
     a_channel += "Channel Name: " + get_channel_name(doc) + "\n"
     a_channel += "Channel Bias: " + get_bias(doc) + "\n"
@@ -176,6 +175,16 @@ def get_channel_list(channel_count):
     return cursor
 
 
+def delete_channel(channel_name):
+    """
+    Deletes a single channel with the given name.
+    :param channel_name:
+    :return:
+    """
+    filter_cond = {"snippet.title": channel_name}
+    channel.delete_one(filter_cond)
+
+
 def print_application_options():
     print("1. Get the most subscribed left wing biased channel")
     print("2. Get the most subscribed right wing biased channel")
@@ -192,6 +201,7 @@ def print_application_options():
     print("13. Delete a channel")
     print("14. Add a channel")
     print("15. Update a channel’s name")
+    print("16. Get List of Channels")
 
 
 def main():
@@ -212,9 +222,11 @@ def main():
                        "do: ")
         if choice == "quit":
             run = False
+            exit()
         if choice == "options":
             print_application_options()
-        execute_choice(choice)
+        execute_choice(int(choice))
+
 
 
 if __name__ == "__main__":
