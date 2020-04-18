@@ -86,11 +86,13 @@ def execute_choice(choice):
         channel_name = input("Enter name of channel: ")
         delete_channel(channel_name)
     elif choice == 14:
-        # exec function
-        print("execute choice to be done")
+        name = input("Name of channel: ")
+        desc = input("Description of channel: ")
+        print(create_channel(name, desc))
     elif choice == 15:
-        # exec function
-        print("execute choice to be done")
+        old_name = input("name of channel to change: ")
+        new_name = input("new name of channel: ")
+        print(update_channel_name(old_name, new_name))
     elif choice == 16:
         num = input("How many channels fo you want to see: ")
         num = int(num)
@@ -183,6 +185,29 @@ def delete_channel(channel_name):
     """
     filter_cond = {"snippet.title": channel_name}
     channel.delete_one(filter_cond)
+
+
+def update_channel_name(old_name, new_name):
+    """
+    Update a channels name given old name.
+    :param old_name: the name used to find old channel
+    :param new_name: the new name of the channel
+    :return: the number of documents modified
+    """
+    filter_cond = {"snippet.title": old_name}
+    update = {"$set": {"snippet.title": new_name}}
+    result = channel.update_one(filter_cond, update)
+    return result.modified_count
+
+
+def create_channel(name, description):
+    """
+    Create a channel given name and description
+    :return:
+    """
+    doc = {"snippet": {"title": name, "description": description}}
+    result = channel.insert_one(doc)
+    return result.inserted_id
 
 
 def print_application_options():
