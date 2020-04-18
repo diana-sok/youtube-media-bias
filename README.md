@@ -12,6 +12,7 @@ Alternatively, you can install the package within the Pycharm IDE.
 **Install mongoDB**
 
 Reference for macOS: https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/
+
 Reference for windows: https://docs.mongodb.com/manual/tutorial/install-mongodb-on-windows/
 
 ## The following steps can be used create a single node system:
@@ -27,6 +28,7 @@ youtube-media-bias
 cd 'youtube-media-bias'
 ```
 **2. Populate database**
+
 the following will create a db called youtube, and populates youtube.channel with documents in dataset.json
 ```
 mongoimport --db youtube --collection channel --file dataset.json --jsonArray
@@ -47,5 +49,6 @@ db.channel.find({},{"snippet.title":1})
 ```
 ## Use the following to run the Python application
 **1. Open your project folder in PyCharm and run youtube.py**
+
 Observe the terminal in pycharm
 
