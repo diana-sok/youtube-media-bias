@@ -50,5 +50,5 @@ db.channel.find({},{"snippet.title":1})
 ## Use the following to run the Python application
 **1. Open your project folder in PyCharm and run youtube.py**
 
-Observe the terminal in pycharm
+Observe the console in pycharm
 
