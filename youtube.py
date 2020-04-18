@@ -1,9 +1,14 @@
 import pymongo
 from pymongo import MongoClient
+from pprint import pprint
 
 cluster = MongoClient("mongodb://localhost:27017/")
 db = cluster["youtube"]
 channel = db["channel"]
+
+print("serverStatus['connections']")
+serverStatusResult=db.command("serverStatus")
+pprint(serverStatusResult['connections'])
 
 # to check if database exists
 db_list = cluster.list_database_names()
@@ -84,15 +89,17 @@ def execute_choice(choice):
         print(get_result_string(cursor))
     elif choice == 13:
         channel_name = input("Enter name of channel: ")
-        delete_channel(channel_name)
+        print("This many documents were deleted:" + str(delete_channel(
+            channel_name)))
     elif choice == 14:
         name = input("Name of channel: ")
         desc = input("Description of channel: ")
-        print(create_channel(name, desc))
+        print("id of added doc:" + str(create_channel(name, desc)))
     elif choice == 15:
-        old_name = input("name of channel to change: ")
-        new_name = input("new name of channel: ")
-        print(update_channel_name(old_name, new_name))
+        old_name = input("Name of channel to change: ")
+        new_name = input("New name of channel: ")
+        print("This many documents changed:" + str(update_channel_name(
+            old_name, new_name)))
     elif choice == 16:
         num = input("How many channels fo you want to see: ")
         num = int(num)
@@ -181,10 +188,11 @@ def delete_channel(channel_name):
     """
     Deletes a single channel with the given name.
     :param channel_name:
-    :return:
+    :return: the number of documents deleted
     """
     filter_cond = {"snippet.title": channel_name}
-    channel.delete_one(filter_cond)
+    result = channel.delete_one(filter_cond)
+    return result.deleted_count
 
 
 def update_channel_name(old_name, new_name):
@@ -233,12 +241,11 @@ def main():
     print("---------------------------------------------------------")
     print("Youtube Media Bias")
     print("Check the media bias of Youtube Channels with this application!")
+    print_application_options()
 
     # Loop application
     run = True
     while run:
-        print("---------------------------------------------------------")
-        print_application_options()
         print("---------------------------------------------------------")
         print("Type 'quit' to quit the application")
         print("Type 'options' to print the menu options")
