@@ -1,7 +1,7 @@
 # youtube-media-bias
 Python Version: 3.7
 
-##General Set Up
+## General Set Up
 **Install pymongo**
 Reference for installing pymongo with terminal:
 https://www.mongodb.com/blog/post/getting-started-with-python-and-mongodb
@@ -12,7 +12,7 @@ Alternatively, you can install the package within the Pycharm IDE.
 Reference for macOS: https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/
 Reference for windows: https://docs.mongodb.com/manual/tutorial/install-mongodb-on-windows/
 
-##The following steps can be used create a single node system:
+## The following steps can be used create a single node system:
 ```
 Note: My project file Strucutre looks like this:
 youtube-media-bias
@@ -43,7 +43,7 @@ mongo
 use youtube
 db.channel.find({},{"snippet.title":1})
 ```
-##Use the following to run the Python application
+## Use the following to run the Python application
 **1. Open your project folder in PyCharm and run youtube.py**
 Observe the terminal in pycharm
 
