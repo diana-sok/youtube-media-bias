@@ -9,7 +9,7 @@ with open('wrangled.json', 'a') as out_file, open('dataset.json', 'r') as \
 
     # convert json strings in in_file to dictionaries
     original_data = json.load(in_file)
-    
+
     for channel in original_data:
         # create a dictionary containing relevant channel data
         modified_channel = {"media": channel["media"],
@@ -21,6 +21,8 @@ with open('wrangled.json', 'a') as out_file, open('dataset.json', 'r') as \
                             "language_information": channel["language_information"],
                             "bias": channel["bias"],
                             }
+        
         # convert dictionary to string and append to out_file
         json.dump(modified_channel, out_file)
+
         out_file.write("\n")  # append new line to out_file for visuals

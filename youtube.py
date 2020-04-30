@@ -111,8 +111,8 @@ def execute_choice(choice):
 def get_result_string(cursor):
     """
     Create string representation of query result pointed to by cursor.
-    :param cursor:
-    :return:
+    :param cursor: cursor returned by a query
+    :return: string representation of query results
     """
     channels = ""
     for doc in cursor:
@@ -123,9 +123,9 @@ def get_result_string(cursor):
 
 def get_channel_string(doc):
     """
-    Create a string representation of channel document
-    :param doc:
-    :return:
+    Create a string representation of a channel doc (represented as a dict).
+    :param doc: a dictionary representing a channel document
+    :return: the string representation of a channel document
     """
     a_channel = ""
     a_channel += "Channel Name: " + get_channel_name(doc) + "\n"
@@ -136,8 +136,8 @@ def get_channel_string(doc):
 
 def get_channel_name(doc):
     """
-    Retrieves the name of the channel from doc.
-    :param doc: the document to retrieve the channel name from
+    Retrieves the name of the channel from doc (represented as a dict).
+    :param doc: the dictionary to retrieve the channel name from
     :return: string containing channel name
     """
     return doc["snippet"]["title"]
@@ -145,8 +145,8 @@ def get_channel_name(doc):
 
 def get_bias(doc):
     """
-    Retrieves the bias of the channel from doc.
-    :param doc: the document to retrieve the channel bias from
+    Retrieves the bias of the channel from doc (represented as a dict).
+    :param doc: the dictionary to retrieve the channel bias from
     :return: string containing channel bias
     """
     return doc["bias"]
@@ -154,7 +154,7 @@ def get_bias(doc):
 
 def get_subscriber_count(doc):
     """
-    Retrieves the subscriber count of the channel from doc.
+    Retrieves the subscriber count of the channel from doc (represented as dict)
     :param doc: the document to retrieve the subscriber count from
     :return: number representing the subscriber count
     """
@@ -172,12 +172,11 @@ def get_most_viewed_channel():
     return cursor
 
 
-# this is a sample function
 def get_channel_list(channel_count):
     """
     Get the specified amount of channels.
-    :param channel_count:
-    :return: cursor pointing to a
+    :param channel_count: the number of channels to retrieve
+    :return: a cursor pointing to query results
     """
     query = {}
     cursor = channel.find(query).limit(channel_count)
@@ -187,7 +186,7 @@ def get_channel_list(channel_count):
 def delete_channel(channel_name):
     """
     Deletes a single channel with the given name.
-    :param channel_name:
+    :param channel_name: the name of channel to delete
     :return: the number of documents deleted
     """
     filter_cond = {"snippet.title": channel_name}
@@ -211,7 +210,7 @@ def update_channel_name(old_name, new_name):
 def create_channel(name, description):
     """
     Create a channel given name and description
-    :return:
+    :return: the id of the inserted document
     """
     doc = {"snippet": {"title": name, "description": description}}
     result = channel.insert_one(doc)
@@ -257,8 +256,8 @@ def main():
             exit()
         if choice == "options":
             print_application_options()
-        execute_choice(int(choice))
 
+        execute_choice(int(choice))
 
 
 if __name__ == "__main__":
