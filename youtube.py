@@ -249,15 +249,19 @@ def main():
         print("Type 'quit' to quit the application")
         print("Type 'options' to print the menu options")
         print("---------------------------------------------------------")
+
+        # get user's choice of action
         choice = input("Enter the number option for what you would like to "
                        "do: ")
+
+        # perform user's choice of action
         if choice == "quit":
             run = False
             exit()
-        if choice == "options":
+        elif choice == "options":
             print_application_options()
-
-        execute_choice(int(choice))
+        else:
+            execute_choice(int(choice))
 
 
 if __name__ == "__main__":
