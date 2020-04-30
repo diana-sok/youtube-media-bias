@@ -23,24 +23,24 @@ youtube-media-bias
 |- -wrangle.py
 |- -dataset.json
 ```
-**1. Navigate to project file**
-```
-cd 'youtube-media-bias'
-```
-**2. Populate database**
-
-the following will create a db called youtube, and populates youtube.channel with documents in dataset.json
-```
-mongoimport --db youtube --collection channel --file dataset.json --jsonArray
-```
-**3. Start mongod**
+**1. Start mongodb**
 macOS: 
 ```
 brew services start mongodb-community@4.2
 ````
-**4. Start mongo**
+**2. Start mongo**
 ```
 mongo
+```
+**3. Navigate to project file**
+```
+cd 'youtube-media-bias'
+```
+**4. Populate database**
+
+the following will create a db called youtube, and populates youtube.channel with documents in dataset.json
+```
+mongoimport --db youtube --collection channel --file dataset.json --jsonArray
 ```
 **5. Test a query**
 ```
