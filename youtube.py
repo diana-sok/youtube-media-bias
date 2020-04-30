@@ -28,7 +28,8 @@ else:
 def execute_choice(choice):
     """
     Performs the action specified by user.
-    :param choice: 1 - Get the most subscribed left wing biased channel
+    :param choice: a number
+                   1 - Get the most subscribed left wing biased channel
                    2 - Get the most subscribed right wing biased channel
                    3 - Get the high factual reporting, left wing biased
                        channels
@@ -261,7 +262,11 @@ def main():
         elif choice == "options":
             print_application_options()
         else:
-            execute_choice(int(choice))
+            try:
+                execute_choice(int(choice))
+            except:
+                print("invalid input!")
+                print_application_options()
 
 
 if __name__ == "__main__":
