@@ -7,9 +7,9 @@ with open('generated_data.json', 'a') as out_file, \
         open('wrangled.json', 'r') as in_file:
 
     for line in in_file:
-        # each document in the json file will be modified 1250 times
-        # note: in_file is 801KB, 1GB is approximately 801 * 1251
-        for i in range(1, 1251):
+        # each document in the json file will be modified 1300 times
+        # note: in_file is 801KB, 1GB is approximately 801 * 1300
+        for i in range(1, 1301):
             channel = json.loads(line)  # convert json string to dict
 
             # modify the channel
