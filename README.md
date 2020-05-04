@@ -23,26 +23,39 @@ youtube-media-bias
 |- -wrangle.py
 |- -dataset.json
 ```
-**1. Start mongodb**
-macOS: 
+**1. Create Docker with official Mongo image**
+macOS:
 ```
-brew services start mongodb-community@4.2
-````
-**2. Start mongo**
+docker run -d -p 27017:27017 --name nodename mongo
+```
+
+**2. Create generated_data.json**
+Run generate.py from youtube-media-bias folder
+```
+python generate.py
+```
+
+**3. Copy dataset to Docker container**
+```
+docker cp generated_data.json nodename:/dataset.json
+```
+
+**4. In container nodename, install pymongo**
+```
+pip3 install pymongo
+```
+
+**5. Import dataset to mongoDB**
+the following will create a db called youtube, and populates youtube.channel with documents in dataset.json
+```
+mongoimport --db youtube --collection channel --file dataset.json
+```
+**6. Run mongo**
 ```
 mongo
 ```
-**3. Navigate to project file**
-```
-cd 'youtube-media-bias'
-```
-**4. Populate database**
 
-the following will create a db called youtube, and populates youtube.channel with documents in dataset.json
-```
-mongoimport --db youtube --collection channel --file dataset.json --jsonArray
-```
-**5. Test a query**
+**7. Test a query**
 ```
 use youtube
 db.channel.find({},{"snippet.title":1})
@@ -51,4 +64,3 @@ db.channel.find({},{"snippet.title":1})
 **1. Open your project folder in PyCharm and run youtube.py**
 
 Observe the console in pycharm
-

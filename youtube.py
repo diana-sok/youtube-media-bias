@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 from pprint import pprint
 
-cluster = MongoClient("mongodb://localhost:27017/")
+cluster = MongoClient("mongodb://127.0.0.1:27017")
 db = cluster["youtube"]
 channel = db["channel"]
 
