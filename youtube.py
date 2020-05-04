@@ -95,8 +95,8 @@ def execute_choice(choice):
         # exec function
         print("execute choice to be done")
     elif choice == 11:
-        # exec function
-        print("execute choice to be done")
+        cursor = get_most_subscribed_channel()
+        print(get_result_string(cursor))
     elif choice == 12:
         cursor = get_most_viewed_channel()
         print(get_result_string(cursor))
@@ -297,7 +297,18 @@ def get_most_viewed_channel():
     :return: cursor pointing to most viewed channel
     """
     query = {}
-    sort_parameter = [("statistics.videoCount", -1)]
+    sort_parameter = [("statistics.viewCount", -1)]
+    cursor = channel.find(query).sort(sort_parameter).limit(1)
+    return cursor
+
+
+def get_most_subscribed_channel():
+    """
+    Returns a cursor pointing to the most subscribed channel.
+    :return: cursor pointing to most subscribed channel
+    """
+    query = {}
+    sort_parameter = [("statistics.subscriberCount", -1)]
     cursor = channel.find(query).sort(sort_parameter).limit(1)
     return cursor
 
@@ -350,8 +361,6 @@ def create_channel(name, description):
 def print_application_options():
     print("1. Get the most subscribed left wing biased channel")
     print("2. Get the most subscribed right wing biased channel")
-    # print("3. Get the high factual reporting, left wing biased channels")
-    # print("4. Get the high factual reporting, right wing biased channels")
     print("3. Get the most subscribed, left wing biased, "
           "high factual reporting level channel")
     print("4. Get the most subscribed, right wing biased, "
