@@ -1,20 +1,6 @@
 # youtube-media-bias
 Python Version: 3.7
 
-## General Set Up
-**Install pymongo**
-
-Reference for installing pymongo with terminal:
-https://www.mongodb.com/blog/post/getting-started-with-python-and-mongodb
-
-Alternatively, you can install the package within the Pycharm IDE.
-
-**Install mongoDB**
-
-Reference for macOS: https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/
-
-Reference for windows: https://docs.mongodb.com/manual/tutorial/install-mongodb-on-windows/
-
 ## The following steps can be used create a single node system:
 ```
 Note: My project file Strucutre looks like this:
