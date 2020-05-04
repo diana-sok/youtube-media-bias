@@ -1,4 +1,3 @@
-import pymongo
 from pymongo import MongoClient
 from pprint import pprint
 
@@ -7,7 +6,7 @@ db = cluster["youtube"]
 channel = db["channel"]
 
 print("serverStatus['connections']")
-serverStatusResult=db.command("serverStatus")
+serverStatusResult = db.command("serverStatus")
 pprint(serverStatusResult['connections'])
 
 # to check if database exists
@@ -31,10 +30,10 @@ def execute_choice(choice):
     :param choice: a number
                    1 - Get the most subscribed left wing biased channel
                    2 - Get the most subscribed right wing biased channel
-                   3 - Get the high factual reporting, left wing biased
-                       channels
-                   4 - Get the high factual reporting, right wing biased
-                       channels
+                   3 - Get the most subscribed high factual reporting,
+                       left wing biased channels
+                   4 - Get the most subscribed high factual reporting,
+                       right wing biased channels
                    5 - Get the most subscribed, left wing biased, low factual
                        reporting level channel
                    6 - Get the most subscribed, right wing biased, low factual
@@ -48,28 +47,41 @@ def execute_choice(choice):
                    13 - Delete a channel
                    14 - Add a channel
                    15 - Update a channel’s name
+                   16 - Get List of Channels
     :return: documents found
     """
     # temporary implementation, will probably change in future
     result = {}
     if choice == 1:
-        # exec function
-        print("execute choice to be done")
+        cursor = get_most_sub_left()
+        print(get_result_string(cursor))
     elif choice == 2:
-        # exec function
-        print("execute choice to be done")
+        cursor = get_most_sub_right()
+        print(get_result_string(cursor))
     elif choice == 3:
-        # exec function
-        print("execute choice to be done")
+        max_num = count_most_sub_high_fact_report_left()
+        num = input("How many results would you like to see? " +
+                    str(max_num) + " possibilities:  ")
+        num = int(num)
+        cursor = get_most_sub_high_fact_report_left(num)
+        print(get_result_string(cursor))
     elif choice == 4:
-        # exec function
-        print("execute choice to be done")
+        max_num = count_most_sub_high_fact_report_right()
+        num = input("How many results would you like to see? " +
+                    str(max_num) + " possibilities:  ")
+        num = int(num)
+        cursor = get_most_sub_high_fact_report_right(num)
+        print(get_result_string(cursor))
     elif choice == 5:
-        # exec function
-        print("execute choice to be done")
+        num = input("How many results would you like to see?: ")
+        num = int(num)
+        cursor = get_most_sub_low_fact_report_left(num)
+        print(get_result_string(cursor))
     elif choice == 6:
-        # exec function
-        print("execute choice to be done")
+        num = input("How many results would you like to see?: ")
+        num = int(num)
+        cursor = get_most_sub_low_fact_report_right(num)
+        print(get_result_string(cursor))
     elif choice == 7:
         # exec function
         print("execute choice to be done")
@@ -109,6 +121,112 @@ def execute_choice(choice):
         print("invalid choice")
 
 
+def get_most_sub_left():
+    """
+    Get the most subscribed left wing biased channel
+    :return: a cursor pointing to most subscribed right wing biased channel
+    """
+    query = {"media.bias": {"$regex": "left", "$options": "i"}}
+    sort_parameter = [("statistics.subscriberCount", -1)]
+    cursor = channel.find(query).sort(sort_parameter).limit(1)
+    return cursor
+
+
+def get_most_sub_right():
+    """
+    Get the most subscribed right wing biased channel
+    :return: a cursor pointing to most subscribed right wing biased channel
+    """
+    query = {"media.bias": {"$regex": "right", "$options": "i"}}
+    sort_parameter = [("statistics.subscriberCount", -1)]
+    cursor = channel.find(query).sort(sort_parameter).limit(1)
+    return cursor
+
+
+def count_most_sub_high_fact_report_left():
+    """
+    Count the most subscribed high factual reporting, left wing biased channels
+    :return: number of possible results
+    """
+    query = {
+        "media.factual_reporting_label": {"$regex": "HIGH", "$options": "i"},
+        "media.bias": {"$regex": "left", "$options": "i"}}
+    cursor = channel.count_documents(query)
+    return int(cursor)
+
+
+def get_most_sub_high_fact_report_left(num):
+    """
+    Get the most subscribed high factual reporting, left wing biased channels
+    :param num: number of results to return
+    :return: a cursor pointing to the high factual reporting,
+             left wing biased channels
+    """
+    query = {
+        "media.factual_reporting_label": {"$regex": "HIGH", "$options": "i"},
+        "media.bias": {"$regex": "left", "$options": "i"}}
+    sort = [("statistics.subscriberCount", -1)]
+    cursor = channel.find(query).sort(sort).limit(num)
+    return cursor
+
+
+def count_most_sub_high_fact_report_right():
+    """
+    Count the most subscribed high factual reporting, right wing biased channel
+    :return: number of possible results
+    """
+    query = {
+        "media.factual_reporting_label": {"$regex": "HIGH", "$options": "i"},
+        "media.bias": {"$regex": "right", "$options": "i"}}
+    cursor = channel.count_documents(query)
+    return int(cursor)
+
+
+def get_most_sub_high_fact_report_right(num):
+    """
+    Get the most subscribed high factual reporting, right wing biased channels
+    :param num: number of results to return
+    :return: a cursor pointing to the high factual reporting,
+             right wing biased channels
+    """
+    query = {
+        "media.factual_reporting_label": {"$regex": "HIGH", "$options": "i"},
+        "media.bias": {"$regex": "right", "$options": "i"}}
+    sort = [("statistics.subscriberCount", -1)]
+    cursor = channel.find(query).sort(sort).limit(num)
+    return cursor
+
+
+def get_most_sub_low_fact_report_left(num):
+    """
+    Get the most subscribed low factual reporting, left wing biased channels
+    :param num: number of results to return
+    :return: a cursor pointing to the high factual reporting,
+             left wing biased channels
+    """
+    query = {
+        "media.factual_reporting_label": {"$in": ["MIXED", None]},
+        "media.bias": {"$regex": "left", "$options": "i"}}
+    sort = [("statistics.subscriberCount", -1)]
+    cursor = channel.find(query).sort(sort).limit(num)
+    return cursor
+
+
+def get_most_sub_low_fact_report_right(num):
+    """
+    Get the most subscribed low factual reporting, right wing biased channels
+    :param num: number of results to return
+    :return: a cursor pointing to the high factual reporting,
+             right wing biased channel
+    """
+    query = {
+        "media.factual_reporting_label": {"$in": ["MIXED", None]},
+        "media.bias": {"$regex": "right", "$options": "i"}}
+    sort = [("statistics.subscriberCount", -1)]
+    cursor = channel.find(query).sort(sort).limit(num)
+    return cursor
+
+
 def get_result_string(cursor):
     """
     Create string representation of query result pointed to by cursor.
@@ -132,7 +250,18 @@ def get_channel_string(doc):
     a_channel += "Channel Name: " + get_channel_name(doc) + "\n"
     a_channel += "Channel Bias: " + get_bias(doc) + "\n"
     a_channel += "Subscribers: " + str(get_subscriber_count(doc)) + "\n"
+    a_channel += "Factual Reporting: " + get_fact_label(doc) + "\n"
     return a_channel
+
+
+def get_fact_label(doc):
+    """
+    Retrieves the factual reporting label of the channel from doc
+    (represented as a dict).
+    :param doc: the dictionary to retrieve the factual reporting label
+    :return: string containing the factual reporting label
+    """
+    return str(doc["media"]["factual_reporting_label"])
 
 
 def get_channel_name(doc):
@@ -232,10 +361,14 @@ def create_channel(name, description):
 def print_application_options():
     print("1. Get the most subscribed left wing biased channel")
     print("2. Get the most subscribed right wing biased channel")
-    print("3. Get the high factual reporting, left wing biased channels")
-    print("4. Get the high factual reporting, right wing biased channels")
-    print("5. Get the most subscribed, left wing biased, low factual reporting level channel")
-    print("6. Get the most subscribed, right wing biased, low factual reporting level channel")
+    print("3. Get the most subscribed, left wing biased, "
+          "high factual reporting level channel")
+    print("4. Get the most subscribed, right wing biased, "
+          "high factual reporting level channel")
+    print("5. Get the most subscribed, left wing biased, "
+          "low factual reporting level channel")
+    print("6. Get the most subscribed, right wing biased, "
+          "low factual reporting level channel")
     print("7. Get the most viewed left wing biased channel")
     print("8. Get the left wing biased channel with the most videos")
     print("9. Get the right wing biased channel with the most videos")
@@ -268,6 +401,7 @@ def main():
 
         # perform user's choice of action
         if choice == "quit":
+            print("\nBye!")
             run = False
             exit()
         elif choice == "options":
@@ -282,3 +416,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
