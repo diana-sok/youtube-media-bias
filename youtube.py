@@ -135,22 +135,21 @@ def execute_choice(choice):
         print(get_channel_string(result)) if result else print("N/A")
     elif choice == 18:
         name = input("Name of the channel to view: ")
-        result = get_channels_with_name(name)
-        print(get_result_string(result)) if len(list(result)) > 0 \
-            else print("N/A")
+        result = get_channel_with_name(name)
+        print(get_channel_string(result)) if result else print("N/A")
     else:
         print("invalid choice")
 
 
-def get_channels_with_name(name):
+def get_channel_with_name(name):
     """
-    Retrieves a cursor pointing to documents of given name.
+    Retrieves a document pointing to documents of given name.
     :param name: the name of channels to find
-    :return: cursor pointing to documents with given name
+    :return: a document with given name
     """
     filter_cond = {"snippet.title": name}
-    cursor = channel.find(filter_cond)
-    return cursor
+    result = channel.find_one(filter_cond)
+    return result
 
 
 def get_channel_with_id(youtube_id):
