@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 from pprint import pprint
 
-cluster = MongoClient("mongodb://127.0.0.1:27017/")
+cluster = MongoClient("mongodb://localhost:27017/")  # change to 1p-dns:27021
 db = cluster["youtube"]
 channel = db["channel"]
 
@@ -48,6 +48,8 @@ def execute_choice(choice):
                    14 - Add a channel
                    15 - Update a channel’s name
                    16 - Get List of Channels
+                   17 - View a channel given id
+                   18 - View a channel given name
     :return: documents found
     """
     # temporary implementation, will probably change in future
@@ -109,24 +111,58 @@ def execute_choice(choice):
         cursor = get_most_viewed_channel()
         print(get_result_string(cursor))
     elif choice == 13:
-        channel_name = input("Enter name of channel: ")
+        youtube_id = input("Enter id of channel: ")
         print("This many documents were deleted:" + str(delete_channel(
-            channel_name)))
+            youtube_id)))
     elif choice == 14:
         name = input("Name of channel: ")
         desc = input("Description of channel: ")
-        print("id of added doc:" + str(create_channel(name, desc)))
+        youtube_id = input("ID of channel: ")
+        print("ID of the added doc:" + str(create_channel(name, desc,
+                                                          youtube_id)))
     elif choice == 15:
-        old_name = input("Name of channel to change: ")
+        youtube_id = input("Youtube ID of the channel to change: ")
         new_name = input("New name of channel: ")
-        print("This many documents changed:" + str(update_channel_name(
-            old_name, new_name)))
+        print("This many documents changed:" +
+              str(update_channel_name(youtube_id, new_name)))
     elif choice == 16:
-        num = input("How many channels fo you want to see: ")
+        num = input("How many channels do you want to see: ")
         num = int(num)
         print(get_result_string(get_channel_list(num)))
+    elif choice == 17:
+        youtube_id = input("Youtube ID of the channel to view: ")
+        result = get_channel_with_id(youtube_id)
+        print(get_channel_string(result)) if result else print("N/A")
+    elif choice == 18:
+        name = input("Name of the channel to view: ")
+        result = get_channels_with_name(name)
+        print(get_result_string(result)) if len(list(result)) > 0 \
+            else print("N/A")
     else:
         print("invalid choice")
+
+
+def get_channels_with_name(name):
+    """
+    Retrieves a cursor pointing to documents of given name.
+    :param name: the name of channels to find
+    :return: cursor pointing to documents with given name
+    """
+    filter_cond = {"snippet.title": name}
+    cursor = channel.find(filter_cond)
+    return cursor
+
+
+def get_channel_with_id(youtube_id):
+    """
+    A document (represented by a dict) with the given id otherwise none
+    :param youtube_id: the id of the document to retrieve
+    :return: a document with the given id or none if document does not
+    exist
+    """
+    filter_cond = {"youtube_id": youtube_id}
+    result = channel.find_one(filter_cond)
+    return result
 
 
 def get_most_sub_left():
@@ -300,6 +336,7 @@ def get_channel_string(doc):
     """
     a_channel = ""
     a_channel += f'Channel Name: {get_channel_name(doc)} \n'
+    a_channel += f'ID: {get_channel_id(doc)} \n'
     a_channel += f'Channel Bias: {get_bias(doc)} \n'
     a_channel += f'Videos: {get_video_count(doc):,d} \n'
     a_channel += f'Subscribers: {get_subscriber_count(doc):,d} \n'
@@ -308,14 +345,26 @@ def get_channel_string(doc):
     return a_channel
 
 
+def get_channel_id(doc):
+    """
+    Retrieves the youtube id from the doc (represented as a dic).
+    :param doc: the dictionary to retrieve the id from
+    :return: string containing the youtube id
+    """
+    return str(doc["youtube_id"])
+
+
 def get_fact_label(doc):
     """
     Retrieves the factual reporting label of the channel from doc
     (represented as a dict).
     :param doc: the dictionary to retrieve the factual reporting label
-    :return: string containing the factual reporting label
+    :return: string containing the factual reporting label or "no
+    information yet" if the field does not exist
     """
-    return str(doc["media"]["factual_reporting_label"])
+    return doc.get("media", {}).get("factual_reporting_label",
+                                    "no information yet")
+    # str(doc["media"]["factual_reporting_label"])
 
 
 def get_channel_name(doc):
@@ -331,36 +380,41 @@ def get_bias(doc):
     """
     Retrieves the bias of the channel from doc (represented as a dict).
     :param doc: the dictionary to retrieve the channel bias from
-    :return: string containing channel bias
+    :return: string containing channel biasm or "no information yet" if
+    field is not found
     """
-    return doc["bias"]
+    return doc.get("bias", "no information yet")  # doc["bias"]
 
 
 def get_subscriber_count(doc):
     """
     Retrieves the subscriber count of the channel from doc (represented as dict)
     :param doc: the document to retrieve the subscriber count from
-    :return: number representing the subscriber count
+    :return: number representing the subscriber count, -1 if no field found
     """
-    return doc["statistics"]["subscriberCount"]
+    return doc.get("statistics", {}).get("subscriberCount", -1)  # doc[
+    # "statistics"][
+    # "subscriberCount"]
 
 
 def get_view_count(doc):
     """
     Retrieves the view count of the channel from doc (represented as dict)
     :param doc: the document to retrieve the view count from
-    :return: number representing the view count
+    :return: number representing the view count, -1 if no field found
     """
-    return doc["statistics"]["viewCount"]
+    return doc.get("statistics", {}).get("viewCount", -1)  # doc["statistics"][
+    # "viewCount"]
 
 
 def get_video_count(doc):
     """
     Retrieves the video count of the channel from doc (represented as dict)
     :param doc: the document to retrieve the video count from
-    :return: number representing the video count
+    :return: number representing the video count, -1 if field not found
     """
-    return doc["statistics"]["videoCount"]
+    return doc.get("statistics", {}).get("videoCount", -1)
+    # doc["statistics"]["videoCount"]
 
 
 def get_most_viewed_channel():
@@ -396,36 +450,38 @@ def get_channel_list(channel_count):
     return cursor
 
 
-def delete_channel(channel_name):
+def delete_channel(youtube_id):
     """
     Deletes a single channel with the given name.
-    :param channel_name: the name of channel to delete
-    :return: the number of documents deleted
+    :param youtube_id: the id of channel to delete
+    :return: the number of documents deleted (1 or 0)
     """
-    filter_cond = {"snippet.title": channel_name}
+    filter_cond = {"youtube_id": youtube_id}
     result = channel.delete_one(filter_cond)
     return result.deleted_count
 
 
-def update_channel_name(old_name, new_name):
+def update_channel_name(youtube_id, new_name):
     """
-    Update a channels name given old name.
-    :param old_name: the name used to find old channel
+    Update a channels name given the youtube_idd in the db.
+    :param youtube_id: the youtube id of the channel to update
     :param new_name: the new name of the channel
     :return: the number of documents modified
     """
-    filter_cond = {"snippet.title": old_name}
+    # filter_cond = {"snippet.title": old_name}
+    filter_cond = {"youtube_id": youtube_id}
     update = {"$set": {"snippet.title": new_name}}
     result = channel.update_one(filter_cond, update)
     return result.modified_count
 
 
-def create_channel(name, description):
+def create_channel(name, description, youtube_id):
     """
     Create a channel given name and description
     :return: the id of the inserted document
     """
-    doc = {"snippet": {"title": name, "description": description}}
+    doc = {"youtube_id": youtube_id,
+           "snippet": {"title": name, "description": description}}
     result = channel.insert_one(doc)
     return result.inserted_id
 
@@ -451,6 +507,8 @@ def print_application_options():
     print("14. Add a channel")
     print("15. Update a channel’s name")
     print("16. Get List of Channels")
+    print("17. View a channel given id")
+    print("18. View a channel given name")
 
 
 def main():
@@ -479,11 +537,10 @@ def main():
         elif choice == "options":
             print_application_options()
         else:
-            try:
-                execute_choice(int(choice))
-            except:
-                print("invalid input!")
-                print_application_options()
+            execute_choice(int(choice))
+            # except:
+            #     print("Something went wrong")
+            #     print_application_options()
 
 
 if __name__ == "__main__":
