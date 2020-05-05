@@ -83,17 +83,25 @@ def execute_choice(choice):
         cursor = get_most_sub_low_fact_report_right(num)
         print(get_result_string(cursor))
     elif choice == 7:
-        # exec function
-        print("execute choice to be done")
+        num = input("How many results would you like to see?: ")
+        num = int(num)
+        cursor = get_most_viewed_left(num)
+        print(get_result_string(cursor))
     elif choice == 8:
-        # exec function
-        print("execute choice to be done")
+        num = input("How many results would you like to see?: ")
+        num = int(num)
+        cursor = get_most_video_left(num)
+        print(get_result_string(cursor))
     elif choice == 9:
-        # exec function
-        print("execute choice to be done")
+        num = input("How many results would you like to see?: ")
+        num = int(num)
+        cursor = get_most_video_right(num)
+        print(get_result_string(cursor))
     elif choice == 10:
-        # exec function
-        print("execute choice to be done")
+        num = input("How many results would you like to see?: ")
+        num = int(num)
+        cursor = get_most_viewed_right(num)
+        print(get_result_string(cursor))
     elif choice == 11:
         cursor = get_most_subscribed_channel()
         print(get_result_string(cursor))
@@ -124,7 +132,7 @@ def execute_choice(choice):
 def get_most_sub_left():
     """
     Get the most subscribed left wing biased channel
-    :return: a cursor pointing to most subscribed right wing biased channel
+    :return: a cursor pointing to most subscribed left wing biased channel
     """
     query = {"media.bias": {"$regex": "left", "$options": "i"}}
     sort_parameter = [("statistics.subscriberCount", -1)]
@@ -227,6 +235,50 @@ def get_most_sub_low_fact_report_right(num):
     return cursor
 
 
+def get_most_viewed_left(num):
+    """
+    Get the most viewed left wing biased channel
+    :return: a cursor pointing to most viewed left wing biased channel
+    """
+    query = {"media.bias": {"$regex": "left", "$options": "i"}}
+    sort = [("statistics.viewCount", -1)]
+    cursor = channel.find(query).sort(sort).limit(num)
+    return cursor
+
+
+def get_most_viewed_right(num):
+    """
+    Get the most viewed right wing biased channel
+    :return: a cursor pointing to most viewed left wing biased channel
+    """
+    query = {"media.bias": {"$regex": "right", "$options": "i"}}
+    sort = [("statistics.viewCount", -1)]
+    cursor = channel.find(query).sort(sort).limit(num)
+    return cursor
+
+
+def get_most_video_left(num):
+    """
+    Get the most viewed left wing biased channel
+    :return: a cursor pointing to most video left wing biased channel
+    """
+    query = {"media.bias": {"$regex": "left", "$options": "i"}}
+    sort = [("statistics.videoCount", -1)]
+    cursor = channel.find(query).sort(sort).limit(num)
+    return cursor
+
+
+def get_most_video_right(num):
+    """
+    Get the most viewed left wing biased channel
+    :return: a cursor pointing to most video right wing biased channel
+    """
+    query = {"media.bias": {"$regex": "right", "$options": "i"}}
+    sort = [("statistics.videoCount", -1)]
+    cursor = channel.find(query).sort(sort).limit(num)
+    return cursor
+
+
 def get_result_string(cursor):
     """
     Create string representation of query result pointed to by cursor.
@@ -247,10 +299,12 @@ def get_channel_string(doc):
     :return: the string representation of a channel document
     """
     a_channel = ""
-    a_channel += "Channel Name: " + get_channel_name(doc) + "\n"
-    a_channel += "Channel Bias: " + get_bias(doc) + "\n"
-    a_channel += "Subscribers: " + str(get_subscriber_count(doc)) + "\n"
-    a_channel += "Factual Reporting: " + get_fact_label(doc) + "\n"
+    a_channel += f'Channel Name: {get_channel_name(doc)} \n'
+    a_channel += f'Channel Bias: {get_bias(doc)} \n'
+    a_channel += f'Videos: {get_video_count(doc):,d} \n'
+    a_channel += f'Subscribers: {get_subscriber_count(doc):,d} \n'
+    a_channel += f'Views: {get_view_count(doc):,d} \n'
+    a_channel += f'Factual Reporting: {get_fact_label(doc)} \n'
     return a_channel
 
 
@@ -289,6 +343,24 @@ def get_subscriber_count(doc):
     :return: number representing the subscriber count
     """
     return doc["statistics"]["subscriberCount"]
+
+
+def get_view_count(doc):
+    """
+    Retrieves the view count of the channel from doc (represented as dict)
+    :param doc: the document to retrieve the view count from
+    :return: number representing the view count
+    """
+    return doc["statistics"]["viewCount"]
+
+
+def get_video_count(doc):
+    """
+    Retrieves the video count of the channel from doc (represented as dict)
+    :param doc: the document to retrieve the video count from
+    :return: number representing the video count
+    """
+    return doc["statistics"]["videoCount"]
 
 
 def get_most_viewed_channel():
@@ -416,4 +488,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
