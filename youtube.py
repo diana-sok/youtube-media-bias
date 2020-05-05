@@ -537,10 +537,11 @@ def main():
         elif choice == "options":
             print_application_options()
         else:
-            execute_choice(int(choice))
-            # except:
-            #     print("Something went wrong")
-            #     print_application_options()
+            try:
+                execute_choice(int(choice))
+            except:
+                print("Something went wrong")
+                print_application_options()
 
 
 if __name__ == "__main__":
